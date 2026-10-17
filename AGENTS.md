@@ -8,7 +8,8 @@ there is no in-process API. These are the instructions for a coding agent workin
 - The protocol, written for agents:
   https://raw.githubusercontent.com/rhun-editor/extension-protocol/main/v1/v1.md: sections 1-3
   always, then the section of each thing you touch (2 manifest, 5 permissions, 6 documents and
-  edits, 7 limits, 8 messages, 10 testing, 11 releases, 12 views, completion, signature help).
+  edits, 7 limits, 8 messages, 10 testing, 11 releases, 12 views, completion, signature help, definition, references, symbols, code
+  actions, rename, format).
 - The SDK reference and recipes: `.claude/skills/rhun-extension/reference/go.md` (the same
   skill ships for Codex in the `rhun` plugin of rhun-editor/skills).
 
@@ -26,7 +27,7 @@ there is no in-process API. These are the instructions for a coding agent workin
 2. `sh tests/run.sh [RHUN]` (rhun on `PATH` or `~/.local/bin/rhun`; install it from
    https://rhun.app). Update `tests/basic.txt` and `tests/basic.expected` with every behavior
    you add: a command's effect shows in `print-doc`, `print-toast`, `print-marks`,
-   `print-views`, `print-complete` (section 10 lists them).
+   `print-views`, `print-complete`, `print-palette` (section 10 lists them).
 3. `sh tests/check.sh`: every line must be `ok`.
 4. For anything drawn (a view, a chart): add `shot PATH` to a script and look at the picture.
 
