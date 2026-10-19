@@ -31,6 +31,23 @@ The protocol: https://rhun.app/extensions/v1/ (the `rhunext` Go package does the
    **Install from GitHub** takes. `tests/check.sh` runs the conformance checker.
 6. Open a pull request to `rhun-editor/extensions` to be listed in the catalog.
 
+## One module for every system (WebAssembly)
+
+Instead of three binaries, an extension can ship one WebAssembly module that rhun runs itself on
+Linux, macOS and Windows, held to its `[needs]` on every system. In `extension.ini` replace the
+three `run.TARGET` lines with
+
+```ini
+run.wasm32-wasip1 = bin/hello.wasm
+```
+
+`GOOS=wasip1 GOARCH=wasm go build -o bin/hello.wasm .` builds it (`rhunext` reads standard input
+non-blocking there, so goroutines keep running), `tests/run.sh` tests it when the manifest names
+no program for your machine, and the release workflow packs it into every archive. Keeping the
+`run.TARGET` lines as well gives those systems the native binary (faster at heavy work) and the
+module to any other. What the module may use (WASI preview 1, no sockets, no processes): section
+"WebAssembly extensions" of [protocol 1.1](https://rhun.app/extensions/v1.1/).
+
 ## The scripts variant
 
 `scripts/main.sh` and `scripts/main.ps1` are the same extension as a shell script and its

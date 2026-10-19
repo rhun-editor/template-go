@@ -15,7 +15,14 @@ work=$(mktemp -d)
 trap 'rm -rf "$work"' EXIT
 dir=$work/exts/$owner/$name
 mkdir -p "$dir/bin" "$work/proj" "$work/config/rhun" "$work/state"
-CGO_ENABLED=0 go build -o "$dir/bin/$name-$target" .
+if ! grep -q "^run\.$target *=" extension.ini && grep -q '^run\.wasm32-wasip1 *=' extension.ini; then
+    # no program for this system: the WebAssembly module, which rhun runs itself
+    module=$(sed -n 's/^run\.wasm32-wasip1 *= *//p' extension.ini | head -1)
+    mkdir -p "$dir/$(dirname "$module")"
+    GOOS=wasip1 GOARCH=wasm go build -o "$dir/$module" .
+else
+    CGO_ENABLED=0 go build -o "$dir/bin/$name-$target" .
+fi
 cp extension.ini "$dir/"
 printf 'hello world\nsecond line\n' > "$work/proj/sample.txt"
 printf '[files]\nrestore_session = false\nrestore_project = false\n[updates]\ncheck = false\n[git]\nenabled = false\n[ui]\nsidebar = false\nagents_panel = false\n' > "$work/config/rhun/config"
