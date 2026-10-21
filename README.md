@@ -1,8 +1,8 @@
 # rhun extension template (Go)
 
 A rhun extension is a program that rhun starts and talks to over its standard input and output,
-one text line per message. This repository is the smallest useful one: two commands, a toast and
-an edit, in Go, with the release workflow that builds it for Linux, macOS and Windows. Rust is the
+one text line per message. This repository is the smallest useful one: commands with a toast and
+an edit, a key, a menu item and a status item, in Go, with the release workflow that builds it for Linux, macOS and Windows. Rust is the
 first choice for new extensions: see [template-rust](https://github.com/rhun-editor/template-rust).
 
 Written for people and for coding agents: [AGENTS.md](AGENTS.md) is the working guide, and
@@ -18,8 +18,9 @@ The protocol: https://rhun.app/extensions/v1/ (the `rhunext` Go package does the
    extension needs (`[needs]`). The `name` and `owner` must equal the repository's owner and
    name: rhun installs into `~/.config/rhun/extensions/OWNER/NAME/`.
 3. Rename `hello` in `main.go`, `extension.ini` and the comment at the top of
-   `tests/basic.txt`, and change what `Run` does. `Run` receives the command's full
-   name, `NAME.key` (`hello.say`, not `say`), as the `run` event carries it. There is no request
+   `tests/basic.txt`, and change what `Invoke` does. `Invoke` receives each run with the
+   command's name (`inv.Name()` is `say`; `inv.Command` the full `hello.say`), where it came from
+   and what that place passes (below). There is no request
    for the cursor position: an extension that acts on the word under the cursor subscribes to
    `cursor` in `[subscribe]` and remembers the last position per document.
 4. Test headlessly: `tests/run.sh` builds the extension, lays it out the way rhun installs it,
@@ -30,6 +31,33 @@ The protocol: https://rhun.app/extensions/v1/ (the `rhunext` Go package does the
    targets, attests them and publishes `NAME-TARGET.tar.gz` and `sha256sums.txt`, which
    **Install from GitHub** takes. `tests/check.sh` runs the conformance checker.
 6. Open a pull request to `rhun-editor/extensions` to be listed in the catalog.
+
+## Keys, menus, the status bar and language keys
+
+`extension.ini` declares more than commands (protocol 1.1, rhun 0.18):
+
+- `[keys]`: `ctrl+k ctrl+h = greet world when editorFocus` binds a chord to `greet` with the
+  argument `world`, only while text has the focus. One stroke or two; a bare letter needs a
+  `when` that keeps it away from typing.
+- `[menu.editor]` (also `explorer`, `tab`, `terminal`, `editor_title` and the views' menus):
+  `greet.when = resourceExt in '.txt .md'` shows **Greet** in the editor's context menu for those
+  files; `greet.args` is what the item passes.
+- `[status]`: `hello.text = $(play) Hello` puts an item in the status bar, whose click runs
+  `hello.command` with `hello.args`.
+- `[language.Shell]`: language keys for a grammar rhun has (`continue = #` continues a comment
+  on Enter; also brackets, auto-closing pairs, indentation rules, comments, folding markers).
+
+`main.go`'s `Invoke` sees each run's `inv.From` (`palette`, `key`, `menu`, `ref`) and `inv.Body`:
+the binding's arguments, a menu's target line and the item's arguments (`inv.Target()`), a
+command reference's arguments. It needs the `command-args` feature, which `main` asks for.
+The Extensions page lists all of these under **Contributions**, with any line rhun dropped.
+`tests/basic.txt` runs `greet` from the palette, its chord, the menu and the status item.
+
+The SDK's protocol 1.1 additions come with `rhunext` v1.4.0. Until that tag is out, build
+against a checkout of [extension-protocol](https://github.com/rhun-editor/extension-protocol):
+`RHUN_EXT_SDK=/path/to/extension-protocol sh tests/run.sh` (and `tests/check.sh`) make a
+`go.work` in their temporary folder; for your own builds, `go work init . /path/to/extension-protocol`
+(not committed). CI does the same.
 
 ## One module for every system (WebAssembly)
 

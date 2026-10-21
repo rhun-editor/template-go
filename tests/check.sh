@@ -1,7 +1,8 @@
 #!/bin/sh
 # Builds the extension, lays it out as rhun installs it, and runs the conformance checker
 # (rhun-editor/extension-protocol, conformance/ext) against it. usage: tests/check.sh
-# RHUN_EXT_CHECK=path runs a checker you built instead of `go run …@latest`.
+# RHUN_EXT_CHECK=path runs a checker you built instead of `go run …@latest`; RHUN_EXT_SDK=DIR builds
+# against an SDK checkout (rhun-editor/extension-protocol) and runs its checker.
 set -e
 cd "$(dirname "$0")/.."
 name=$(sed -n 's/^name *= *//p' extension.ini | head -1)
@@ -13,6 +14,15 @@ case "$(uname -s)-$(uname -m)" in
 esac
 work=$(mktemp -d)
 trap 'rm -rf "$work"' EXIT
+if [ -n "$RHUN_EXT_SDK" ]; then
+    # an SDK checkout instead of the released module, and its checker
+    printf 'go 1.25\n\nuse (\n\t%s\n\t%s\n)\n' "$PWD" "$RHUN_EXT_SDK" > "$work/go.work"
+    export GOWORK="$work/go.work"
+    if [ -z "$RHUN_EXT_CHECK" ]; then
+        (cd "$RHUN_EXT_SDK" && go build -o "$work/check" ./conformance/ext)
+        RHUN_EXT_CHECK=$work/check
+    fi
+fi
 dir=$work/$owner/$name
 mkdir -p "$dir/bin"
 CGO_ENABLED=0 go build -o "$dir/bin/$name-$target" .
