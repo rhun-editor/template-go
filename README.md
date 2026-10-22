@@ -6,12 +6,16 @@ an edit, a key, a menu item and a status item, in Go, with the release workflow 
 first choice for new extensions: see [template-rust](https://github.com/rhun-editor/template-rust).
 
 Written for people and for coding agents: [AGENTS.md](AGENTS.md) is the working guide, and
-`.claude/skills/rhun-extension` is a skill Claude Code picks up in this folder (Codex: install
-the `rhun` plugin from [rhun-editor/skills](https://github.com/rhun-editor/skills)).
+`rhun-extension` is a skill agents pick up in this folder: Claude Code from `.claude/skills`,
+Codex from `.agents/skills` (it also ships in the `rhun` plugin of
+[rhun-editor/skills](https://github.com/rhun-editor/skills)).
 
 The protocol: https://rhun.app/extensions/v1/ (the `rhunext` Go package does the framing).
 
 ## Make your own
+
+A new extension is best started with `rhun new-extension` (rhun 0.18.1), which makes the folder
+from this template with your names filled in. The alternative is **Use this template** on GitHub:
 
 1. Copy this repository under your GitHub account as `OWNER/NAME`.
 2. In `extension.ini` set `name = NAME`, `owner = OWNER`, `title`, your commands and what the
@@ -30,7 +34,7 @@ The protocol: https://rhun.app/extensions/v1/ (the `rhunext` Go package does the
 5. Tag `vX.Y.Z` (the same as `version` in the manifest). The release workflow builds the three
    targets, attests them and publishes `NAME-TARGET.tar.gz` and `sha256sums.txt`, which
    **Install from GitHub** takes. `tests/check.sh` runs the conformance checker.
-6. Open a pull request to `rhun-editor/extensions` to be listed in the catalog.
+6. Submit the release to the index with `rhun submit-extension` to be listed in the catalog.
 
 ## Keys, menus, the status bar and language keys
 
@@ -53,9 +57,9 @@ command reference's arguments. It needs the `command-args` feature, which `main`
 The Extensions page lists all of these under **Contributions**, with any line rhun dropped.
 `tests/basic.txt` runs `greet` from the palette, its chord, the menu and the status item.
 
-The SDK's protocol 1.1 additions come with `rhunext` v1.4.0. To try an SDK change before it is
-tagged, `RHUN_EXT_SDK=/path/to/extension-protocol sh tests/run.sh` (and `tests/check.sh`) build
-against that checkout through a `go.work` in their temporary folder.
+The SDK's protocol 1.1 additions came with `rhunext` v1.4.0; `go.mod` takes v1.4.2. To try an
+SDK change before it is tagged, `RHUN_EXT_SDK=/path/to/extension-protocol sh tests/run.sh` (and
+`tests/check.sh`) build against that checkout through a `go.work` in their temporary folder.
 
 ## One module for every system (WebAssembly)
 
@@ -90,9 +94,10 @@ instead of the `run.*` binaries, and ships one archive for all targets.
 - While you work, the Extensions page's **Install** menu has **Link a Folder (development)**: rhun
   runs the extension from your folder (build `bin/` first), so rebuild and **Restart** is the loop.
   **From a Folder** and **From an Archive** install a copy or a release `.tar.gz` you built.
-- To be listed under **Browse**, and updated by itself on users' machines, open a pull request to
+- To be listed under **Browse**, and updated by itself on users' machines, submit a release with
+  `rhun submit-extension` (or **Extensions: Submit to Index…**): it opens a pull request to
   [rhun-editor/extensions](https://github.com/rhun-editor/extensions) adding `OWNER/NAME.ini` that
-  pins a release's tag and digests; its checks verify the digests and this workflow's attestation.
+  pins the release's tag and digests; its checks verify the digests and this workflow's attestation.
   An update that asks for more access (`[needs]`) always asks users first.
 - A pack installs several extensions together: an extension without a program whose
   `extension.ini` says `pack = OWNER/NAME …` (at most 16). Release it like any other, with
