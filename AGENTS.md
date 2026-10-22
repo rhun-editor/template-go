@@ -16,8 +16,8 @@ there is no in-process API. These are the instructions for a coding agent workin
 ## Layout
 | Path | What |
 | --- | --- |
-| `extension.ini` | the manifest: `name` and `owner` equal this repository's; commands, `[subscribe]`, `[provides]`, `[needs]`, `[settings]` |
-| `main.go` | the handler: `Ready`, `Run`, `Event`; `View`, `Complete`, `Signature` when it uses section 12 |
+| `extension.ini` | the manifest: `name` and `owner` equal this repository's; commands, `[keys]`, `[menu.LOCATION]`, `[status]`, `[language.NAME]`, `[subscribe]`, `[provides]`, `[needs]`, `[settings]` |
+| `main.go` | the handler: `Ready`, `Invoke` (each run with `From` and its body; `Run` without command-args), `Event`; `View`, `Complete`, `Signature` when it uses section 12 |
 | `tests/run.sh`, `tests/basic.txt`, `tests/basic.expected` | the headless test: rhun runs `basic.txt`, its output must equal `basic.expected` |
 | `tests/check.sh` | the conformance checker against the built extension |
 | `.github/workflows/ci.yml`, `release.yml` | tests on push; a `vX.Y.Z` tag publishes the release |
@@ -37,7 +37,8 @@ there is no in-process API. These are the instructions for a coding agent workin
 - Positions are 1-based lines and 1-based **byte** columns. Ranges are half-open.
 - An edit names the version it was made for; `stale` means the user typed meanwhile: fetch the
   text again and retry once, never loop.
-- Commands in `extension.ini` and in `command()` must match (the palette shows the manifest's).
+- Commands in `extension.ini` and in `Invoke` must match (the palette shows the manifest's); a
+  `[keys]`, `[menu.*]` or `[status]` entry names a command by its local name.
 - Ask only for the permissions you use (`[needs]`): the install dialog lists them in plain words.
 - Keep messages few: do not answer every keystroke with a request; redraw a view only when what
   it shows changed.
