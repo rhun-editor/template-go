@@ -53,11 +53,9 @@ command reference's arguments. It needs the `command-args` feature, which `main`
 The Extensions page lists all of these under **Contributions**, with any line rhun dropped.
 `tests/basic.txt` runs `greet` from the palette, its chord, the menu and the status item.
 
-The SDK's protocol 1.1 additions come with `rhunext` v1.4.0. Until that tag is out, build
-against a checkout of [extension-protocol](https://github.com/rhun-editor/extension-protocol):
-`RHUN_EXT_SDK=/path/to/extension-protocol sh tests/run.sh` (and `tests/check.sh`) make a
-`go.work` in their temporary folder; for your own builds, `go work init . /path/to/extension-protocol`
-(not committed). CI does the same.
+The SDK's protocol 1.1 additions come with `rhunext` v1.4.0. To try an SDK change before it is
+tagged, `RHUN_EXT_SDK=/path/to/extension-protocol sh tests/run.sh` (and `tests/check.sh`) build
+against that checkout through a `go.work` in their temporary folder.
 
 ## One module for every system (WebAssembly)
 
