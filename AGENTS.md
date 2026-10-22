@@ -20,6 +20,7 @@ there is no in-process API. These are the instructions for a coding agent workin
 | `main.go` | the handler: `Ready`, `Invoke` (each run with `From` and its body; `Run` without command-args), `Event`; `View`, `Complete`, `Signature` when it uses section 12 |
 | `tests/run.sh`, `tests/basic.txt`, `tests/basic.expected` | the headless test: rhun runs `basic.txt`, its output must equal `basic.expected` |
 | `tests/check.sh` | the conformance checker against the built extension |
+| `tests/layout.sh` | what ships: copies everything but the source, tests and build files into the extension folder (the tests and the release use it); a new source folder goes on its list |
 | `.github/workflows/ci.yml`, `release.yml` | tests on push; a `vX.Y.Z` tag publishes the release |
 
 ## Loop
